@@ -27,14 +27,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(passwordEncoder());
+		auth.inMemoryAuthentication().withUser("admin").password("admin").roles("USER");
+//		auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(passwordEncoder());
 
 	}
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-
-		http.authorizeRequests().antMatchers("/**").permitAll();
+		http.csrf().disable();
+		http.authorizeRequests().antMatchers("/").permitAll();
 
 	}
 
