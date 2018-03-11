@@ -4,7 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -25,28 +30,55 @@ public class ApachPoiExcelRead {
 	@Autowired
 	private FileService fileService;
 
-	public int[][] getColsRowsOfMarkers(String[] markers) {
-		
-		
-		
-		return new int[1][1];
+	public Map<String, int[]> getColsRowsOfMarker(String marker, Sheet sheet) {
+		Map<String, int[]> colsRowsMarkersMap = new HashMap<>();
+		// go through sheet and assign positions to cells
+		Iterator<Row> rowIterator = sheet.iterator();
+		while (rowIterator.hasNext()) {
+			Row row = rowIterator.next();
+			Iterator<Cell> cellIterator = row.iterator();
+			while (cellIterator.hasNext()) {
+				Cell currentCell = cellIterator.next();
+				if (currentCell.getCellTypeEnum() == CellType.STRING) {
+					if (currentCell.getStringCellValue().equalsIgnoreCase(marker)) {
+
+						colsRowsMarkersMap.put(marker,
+								new int[] { currentCell.getColumnIndex(), currentCell.getRowIndex() });
+						return colsRowsMarkersMap;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
-	public  void ReadFileAndShowData(MultipartFile file) {
+	public Map<String, Set<String>> bindDataByMarkers(Map<String, int[]> markerMap, Sheet sheet) {
+		Map<String, Set<String>>  bindedData = new HashMap<>();
+		// bind data
+		int lastRecord = sheet.getLastRowNum();
+		int[] mapValue = (int[]) markerMap.values().toArray()[0];
+		
+		Cell cell = sheet.getRow(mapValue[1]).getCell(mapValue[0]);
+		
+//		int verPos = 
+	
+
+	}
+
+	public void ReadFileAndBindData(MultipartFile file) {
 		try {
-			File fileOne = fileService.getTempFile(file);
-			
-			FileInputStream excelFile = new FileInputStream(fileOne);
+			FileInputStream excelFile = new FileInputStream(fileService.getTempFile(file));
 			Workbook workbook = new XSSFWorkbook(excelFile);
 			Sheet datatypeSheet = workbook.getSheetAt(0);
-			System.out.println("last row: " + datatypeSheet.getLastRowNum());;
+			System.out.println("last row: " + datatypeSheet.getLastRowNum());
+
 			Iterator<Row> rowIterator = datatypeSheet.iterator();
-			
+
 			while (rowIterator.hasNext()) {
-				
+
 				Row currentRow = rowIterator.next();
 				Iterator<Cell> cellIterator = currentRow.iterator();
-				
+
 				while (cellIterator.hasNext()) {
 					Cell currentCell = cellIterator.next();
 					if (currentCell.getCellTypeEnum() == CellType.STRING) {
@@ -56,7 +88,7 @@ public class ApachPoiExcelRead {
 				}
 			}
 			workbook.close();
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (Exception w) {
@@ -64,4 +96,5 @@ public class ApachPoiExcelRead {
 		}
 
 	}
+
 }
