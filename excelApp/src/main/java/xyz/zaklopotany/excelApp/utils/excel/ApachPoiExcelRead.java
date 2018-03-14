@@ -30,8 +30,8 @@ public class ApachPoiExcelRead {
 	@Autowired
 	private FileService fileService;
 
-	public Map<String, int[]> getColsRowsOfMarker(String marker, Sheet sheet) {
-		Map<String, int[]> colsRowsMarkersMap = new HashMap<>();
+	public int[] getColsRowsOfMarker(String marker, Sheet sheet) {
+		int[] colsRowsMarkersMap = new int[2];
 		// go through sheet and assign positions to cells
 		Iterator<Row> rowIterator = sheet.iterator();
 		while (rowIterator.hasNext()) {
@@ -42,26 +42,29 @@ public class ApachPoiExcelRead {
 				if (currentCell.getCellTypeEnum() == CellType.STRING) {
 					if (currentCell.getStringCellValue().equalsIgnoreCase(marker)) {
 
-						colsRowsMarkersMap.put(marker,
-								new int[] { currentCell.getColumnIndex(), currentCell.getRowIndex() });
+						colsRowsMarkersMap[0] = currentCell.getColumnIndex();
+						colsRowsMarkersMap[1] = currentCell.getRowIndex();
 						return colsRowsMarkersMap;
 					}
 				}
 			}
 		}
-		return null;
+		return colsRowsMarkersMap;
 	}
 
-	public Map<String, Set<String>> bindDataByMarkers(Map<String, int[]> markerMap, Sheet sheet) {
-		Map<String, Set<String>>  bindedData = new HashMap<>();
+	public Set<String> bindDataByMarkers(int[] markerMap, Sheet sheet) {
+		Set<String> bindedData = new HashSet<>();
 		// bind data
 		int lastRecord = sheet.getLastRowNum();
-		int[] mapValue = (int[]) markerMap.values().toArray()[0];
+
+		Cell cell = sheet.getRow(markerMap[1]).getCell(markerMap[0]);
 		
-		Cell cell = sheet.getRow(mapValue[1]).getCell(mapValue[0]);
+		for 
 		
-//		int verPos = 
-	
+		
+		return bindedData;
+
+		// int verPos =
 
 	}
 
